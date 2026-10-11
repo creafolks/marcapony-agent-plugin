@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "marcapony": {
+      "type": "http",
+      "url": "https://mcp.marcapony.com/mcp"
+    }
+  }
+}

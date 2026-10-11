@@ -1,0 +1,17 @@
+{
+  "name": "marcapony",
+  "owner": {
+    "name": "Creafolks",
+    "email": "hello@marcapony.com"
+  },
+  "metadata": {
+    "description": "Marcapony plugins for Claude."
+  },
+  "plugins": [
+    {
+      "name": "marcapony",
+      "source": "./",
+      "description": "Build and edit custom code sections on your Marcapony website from Claude."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "marcapony",
+  "displayName": "Marcapony",
+  "version": "0.1.0",
+  "description": "Build and edit custom code sections on your Marcapony website from Claude: React and Tailwind components that compile and render on your live pages, saved as drafts for you to publish.",
+  "author": {
+    "name": "Creafolks",
+    "email": "hello@marcapony.com",
+    "url": "https://marcapony.com"
+  },
+  "homepage": "https://github.com/creafolks/marcapony-claude-plugin",
+  "repository": "https://github.com/creafolks/marcapony-claude-plugin",
+  "license": "MIT",
+  "keywords": ["marcapony", "website-builder", "custom-code", "react", "tailwind", "cms"]
+}
