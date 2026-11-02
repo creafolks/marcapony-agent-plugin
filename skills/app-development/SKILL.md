@@ -13,7 +13,7 @@ The packages are `create-marcapony-app` (scaffolder), `marcapony` (CLI) and `mar
 
 ## 1. Start or pick up the project
 
-- **Existing project** (it has a `marcapony.json`): read `AGENTS.md` first. The CLI writes it at link time and it lists exactly which API operations the app's key may call. Then read `marcapony.json` and the template `README.md` if there is one. Do not plan features that need operations missing from `AGENTS.md`; tell the user which scope the app needs instead.
+- **Existing project**: every template ships a `marcapony.json`, so that file alone does not mean the project is linked. If there is no `AGENTS.md`, or `marcapony.json` has no `app` field, the project is not linked yet: go to step 2 first. Otherwise read `AGENTS.md` first. The CLI writes it at link time and it lists exactly which API operations the app's key may call. Then read `marcapony.json` and the template `README.md` if there is one. Do not plan features that need operations missing from `AGENTS.md`; tell the user which scope the app needs instead.
 - **New project**: choose the template closest to the request and scaffold it:
 
   ```sh
@@ -39,7 +39,8 @@ Ask the user to generate the pairing code and run the link step themselves, for 
 
 ## 3. Build
 
-- Server code calls the API through the SDK: `createClient({ apiKey: env.MARCAPONY_API_KEY })`. Keep the SDK on a pinned minor range (`~0.7.0` style), because 0.x minors may break; read the SDK `CHANGELOG.md` before upgrading.
+- Server code calls the API through the client the template builds in `src/server/marcapony.ts`: `marcaponyFromEnv(env)` per request, `identityOf()` for the signed-in person, `errorResponse()` for API errors. Do not call `createClient` anywhere else: the helper reads the key, the API address and the app id from the right place, and the app id is what lets `identity()` work. In a project without that file, pass `apiKey`, `baseUrl` and `appId` from `MARCAPONY_API_KEY`, `MARCAPONY_API_URL` and `MARCAPONY_APP_ID`.
+- The SDK is 0.x, so a new minor version (0.7 to 0.8) may break the app. Do not move to a new minor version without reading the SDK `CHANGELOG.md`.
 - **Signed-in people** (portal and dashboard apps): read who is signed in with `mp.identity(request)` and act for them through `mp.forRequest(request)`, created per request and never cached in module scope. Customers get the `me.*` calls; team members get the account groups. `identity()` is for display only; the platform enforces access on every call. Never read, log or forward the identity header or the portal cookie.
 - **Money and writes**: amounts are numbers in the currency's major unit (`250` is 250.00 TRY). Send POSTs that create something payable with a stable `idempotencyKey` derived from what is being charged for.
 - **Errors**: every non-2xx response throws a `MarcaponyError` subclass. `tier_limit_exceeded` and `plugin_required` are permanent for the account's plan; do not retry them, tell the user what the plan or plugin needs.
