@@ -23,7 +23,7 @@ The tools in this skill are the Marcapony connector's tools. Their descriptions 
 
 - The user named a page or a piece of content: `find_content` first. Fall back to `list_pages` only when you need the whole inventory.
 - `get_page_details` and `list_sections` show what is already on the page and in which order.
-- An existing custom code section: `get_section_details` returns its source, its inputs and its `baseHash`. You need the `baseHash` to edit. If it says the section is a language copy that takes its code from a source section, change the source section instead.
+- An existing custom code section: `get_section_details` returns its source, its inputs and its `baseHash`. You need the `baseHash` to edit. If it says the section is a language copy that takes its code from a source section, only some input values can change there: make code and structure changes on the source section, and they reach the copy. A language copy with its own code (detached) is edited directly.
 - A navbar or footer: `get_layout` and `get_layout_custom_code` instead.
 
 If the request does not say which page a new section goes on or what it should contain, ask once for the missing part before writing anything.
@@ -40,7 +40,7 @@ GSAP with ScrollTrigger and three.js are provided by the platform through hooks,
 - Use `useGsap(fn, deps)` for GSAP and `useHostLibrary('three')` for three.js. Never `import` them and never read `window.gsap`, `window.ScrollTrigger` or `window.THREE`: those globals exist in the editor preview but not on the published site, so the code works in the preview and fails live.
 - The server markup must be a complete, visible layout, and the animation only enhances it. Set a starting state such as `opacity: 0` from the animation (`gsap.from`), never in the markup.
 - Pin an inner wrapper that is always rendered (`pin: ref.current`), never the component's root element and never a conditionally rendered node.
-- Honour `reducedMotion`, clean up every listener, observer and WebGL resource, keep one WebGL canvas per page, and keep heavy libraries out of a navbar or footer.
+- Honour `reducedMotion`, clean up every listener, observer and WebGL resource, and keep one WebGL canvas per page. A navbar or footer renders on every page: a short GSAP effect is fine there, three.js is not.
 - A save refused with `TEMPLATE_FEATURE_NOT_AVAILABLE` means the site's website version cannot render that library. Tell the owner to upgrade the website version in the dashboard. Do not imitate the library with hand-written code.
 - For smooth anchor scrolling and scroll progress use `useSiteScroll`, which follows the site's smooth scroll setting.
 
@@ -55,7 +55,7 @@ For a common section (pricing table, testimonial carousel, FAQ, hero):
 ## 6. Write
 
 - New section: `create_custom_code_section`. Expose the text, images and links the owner will want to change as inputs, so they can edit them in the dashboard without touching code. Give inputs a `purpose`, and a `maxLength` and `example` for text, so the dashboard and the in-app assistant fill them well.
-- Targeted change to an existing section: `edit_custom_code` with anchored find and replace hunks and the `baseHash` you read. If it is refused with a conflict, read the section again and re-anchor. The background compile also changes `baseHash`, so a second edit right after the first may need a fresh read.
+- Targeted change to an existing section: `edit_custom_code` with anchored find and replace hunks and the `baseHash` you read. The result carries the new `baseHash`, so a follow-up edit chains on it without another read. If an edit is refused with a conflict, the section changed since you read it (for example the owner edited it): read it again and re-anchor.
 - Rewrite of more than about a third of a component, a post-bound input, or a change to the section's wrapper settings: `update_section` with the complete new source.
 - Navbar or footer: `write_layout_custom_code`. This is live at once on every page, and it replaces the whole source and every input you leave out. Before calling it, tell the user it goes live immediately and get their explicit go-ahead. Send the complete component with all its inputs. The compile runs in the background: poll `get_layout` until it reports the result, and if the compile fails, use `set_layout_mode` to put the site back on its drag-and-drop layout and tell the user.
 
