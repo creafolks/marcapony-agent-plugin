@@ -42,7 +42,7 @@ Ask the user to generate the pairing code and run the link step themselves, for 
 - Server code calls the API through the client the template builds in `src/server/marcapony.ts`: `marcaponyFromEnv(env)` per request, `identityOf()` for the signed-in person, `errorResponse()` for API errors. Do not call `createClient` anywhere else: the helper reads the key, the API address and the app id from the right place, and the app id is what lets `identity()` work. In a project without that file, pass `apiKey`, `baseUrl` and `appId` from `MARCAPONY_API_KEY`, `MARCAPONY_API_URL` and `MARCAPONY_APP_ID`.
 - The SDK is 0.x, so a new minor version (0.7 to 0.8) may break the app. Do not move to a new minor version without reading the SDK `CHANGELOG.md`.
 - **Signed-in people** (portal and dashboard apps): read who is signed in with `mp.identity(request)` and act for them through `mp.forRequest(request)`, created per request and never cached in module scope. Customers get the `me.*` calls; team members get the account groups. `identity()` is for display only; the platform enforces access on every call. Never read, log or forward the identity header or the portal cookie.
-- **Money and writes**: amounts are numbers in the currency's major unit (`250` is 250.00 TRY). Send POSTs that create something payable with a stable `idempotencyKey` derived from what is being charged for.
+- **Money and writes**: amounts are numbers in the currency's major unit (`250` is 250.00 TRY). Pass an `idempotencyKey` to every create call: the SDK retries a POST only when it has one, and the server replays the first response for the same key. Derive it from what the call is for (an order, a booking request), so a retry never charges or books twice.
 - **Errors**: every non-2xx response throws a `MarcaponyError` subclass. `tier_limit_exceeded` and `plugin_required` are permanent for the account's plan; do not retry them, tell the user what the plan or plugin needs.
 - **No storage of its own**: an app may not declare storage bindings. Anything that persists lives in Marcapony through the API.
 - `dataAccess` and `placement` in `marcapony.json` decide whose data the app works with. A deploy can only narrow them; widening is done in the dashboard.
@@ -55,7 +55,7 @@ Ask the user to generate the pairing code and run the link step themselves, for 
 
 ## 5. Deploy
 
-`bun run deploy` builds, uploads and waits until the deployment is live, then prints its address. The environment follows the key, so a test key deploys to test. If the CLI prints `Deploy failed:` the previous version keeps serving; fix the reported reason and deploy again. The owner turns test mode off in the dashboard when the app is ready for real data.
+Ask the user before every deploy, and run `bun run typecheck` first. `bun run deploy` builds, uploads and waits until the deployment is live, then prints its address. A deploy still running when the wait ends prints its deployment id instead: give the user that id and do not deploy again until it has finished. The environment follows the key, so a test key deploys to test. If the CLI prints `Deploy failed:` the previous version keeps serving; fix the reported reason and deploy again. The owner turns test mode off in the dashboard when the app is ready for real data.
 
 ## 6. Finish
 
