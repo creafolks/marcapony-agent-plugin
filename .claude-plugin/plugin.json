@@ -1,8 +1,8 @@
 {
   "name": "marcapony",
   "displayName": "Marcapony",
-  "version": "0.1.0",
-  "description": "Build and edit custom code sections on your Marcapony website from Claude: React and Tailwind components that compile and render on your live pages, saved as drafts for you to publish.",
+  "version": "0.2.0",
+  "description": "Build your Marcapony website from Claude: custom code sections with animation and 3D, navbars and footers, and apps that Marcapony hosts. Page changes are saved as drafts for you to publish.",
   "author": {
     "name": "Creafolks",
     "email": "hello@marcapony.com",
@@ -10,6 +10,10 @@
   },
   "homepage": "https://github.com/creafolks/marcapony-claude-plugin",
   "repository": "https://github.com/creafolks/marcapony-claude-plugin",
+  "documentationUrl": "https://github.com/creafolks/marcapony-claude-plugin#readme",
+  "supportUrl": "https://marcapony.com/iletisim",
+  "privacyPolicyUrl": "https://app.marcapony.com/privacy-policy",
+  "termsOfServiceUrl": "https://app.marcapony.com/terms-of-service",
   "license": "MIT",
-  "keywords": ["marcapony", "website-builder", "custom-code", "react", "tailwind", "cms"]
+  "keywords": ["marcapony", "website-builder", "custom-code", "react", "tailwind", "gsap", "threejs", "apps", "cms"]
 }

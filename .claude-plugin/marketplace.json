@@ -11,7 +11,7 @@
     {
       "name": "marcapony",
       "source": "./",
-      "description": "Build and edit custom code sections on your Marcapony website from Claude."
+      "description": "Build custom code sections, navbars, footers and apps on your Marcapony website from Claude."
     }
   ]
 }
