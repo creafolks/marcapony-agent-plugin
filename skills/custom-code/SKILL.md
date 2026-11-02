@@ -5,7 +5,11 @@ description: Builds or changes custom code sections on a Marcapony website throu
 
 # Custom code sections on Marcapony
 
-A custom code section is a React component (JSX plus optional CSS, Tailwind available) that Marcapony compiles on its servers, renders on the server and hydrates on the live page. You write source; you never build, bundle or deploy anything yourself. Every save is a draft and is kept as a version. The site owner publishes from the Marcapony dashboard. You cannot publish the site, so always tell the user their changes are saved and that they publish them from the dashboard.
+A custom code section is a React component (JSX plus optional CSS, Tailwind available) that Marcapony compiles on its servers, renders on the server and hydrates on the live page. You write source; you never build, bundle or deploy anything yourself. Every save is kept as a version. What happens on the live site depends on what you write:
+
+- **Page sections** are drafts. The live site keeps showing the last published version until the owner publishes from the Marcapony dashboard.
+- **A custom navbar or footer goes live as soon as it is written**, on every page of the site. Treat it as a live change (step 6).
+- The connector can also put a single page live (`update_page` with a published status), publish or schedule a blog post, and schedule a page. Never do any of these unless the user asks for it in so many words. Building or changing a section is not a request to publish.
 
 The tools in this skill are the Marcapony connector's tools. Their descriptions and the authoring guide are the reference; this skill is the order of work. Do not rely on memory for input types, actions, bindings, hooks or theme tokens: read the guide.
 
@@ -53,7 +57,7 @@ For a common section (pricing table, testimonial carousel, FAQ, hero):
 - New section: `create_custom_code_section`. Expose the text, images and links the owner will want to change as inputs, so they can edit them in the dashboard without touching code. Give inputs a `purpose`, and a `maxLength` and `example` for text, so the dashboard and the in-app assistant fill them well.
 - Targeted change to an existing section: `edit_custom_code` with anchored find and replace hunks and the `baseHash` you read. If it is refused with a conflict, read the section again and re-anchor. The background compile also changes `baseHash`, so a second edit right after the first may need a fresh read.
 - Rewrite of more than about a third of a component, a post-bound input, or a change to the section's wrapper settings: `update_section` with the complete new source.
-- Navbar or footer: `write_layout_custom_code`.
+- Navbar or footer: `write_layout_custom_code`. This is live at once on every page, and it replaces the whole source and every input you leave out. Before calling it, tell the user it goes live immediately and get their explicit go-ahead. Send the complete component with all its inputs. The compile runs in the background: poll `get_layout` until it reports the result, and if the compile fails, use `set_layout_mode` to put the site back on its drag-and-drop layout and tell the user.
 
 Media for inputs: `search_images` searches the account's own images by description (pass `scope: "library"` for the shared public library), `list_recent_uploads` shows what the user just uploaded, and `upload_asset` adds a file from a public URL to the media library.
 
@@ -64,4 +68,4 @@ Media for inputs: `search_images` searches the account's own images by descripti
 
 ## 8. Finish
 
-Summarise what changed and where (page, section), mention anything the owner has to do (upgrade the website version, fill an input, approve a library submission), and say plainly that the changes are drafts the owner publishes from the Marcapony dashboard.
+Summarise what changed and where (page, section), mention anything the owner has to do (upgrade the website version, fill an input, approve a library submission), and say plainly which changes are drafts the owner publishes from the Marcapony dashboard and which are already live (a navbar or footer, or anything the user asked you to publish).
