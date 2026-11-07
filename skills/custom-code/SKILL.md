@@ -1,6 +1,8 @@
 ---
 name: custom-code
 description: Builds or changes custom code sections on a Marcapony website through the Marcapony connector. A custom code section is a React and Tailwind component that Marcapony compiles and renders on the live page; this skill also covers a custom navbar or footer, scroll animations with GSAP and ScrollTrigger, three.js scenes, smooth scroll, and components from the account or platform section library. Use when the user asks for a new section the site builder does not offer, wants to restyle, fix or rework an existing custom code section, wants an animated or 3D section, or wants to reuse a library component.
+license: MIT
+compatibility: Needs the Marcapony MCP connector (https://mcp.marcapony.com/mcp) connected to the user's Marcapony account.
 ---
 
 # Custom code sections on Marcapony

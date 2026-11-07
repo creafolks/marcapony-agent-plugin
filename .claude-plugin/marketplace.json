@@ -5,13 +5,13 @@
     "email": "hello@marcapony.com"
   },
   "metadata": {
-    "description": "Marcapony plugins for Claude."
+    "description": "Marcapony plugins for AI assistants."
   },
   "plugins": [
     {
       "name": "marcapony",
       "source": "./",
-      "description": "Build custom code sections, navbars, footers and apps on your Marcapony website from Claude."
+      "description": "Build custom code sections, navbars, footers and apps on your Marcapony website with your AI assistant."
     }
   ]
 }

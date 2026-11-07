@@ -2,19 +2,19 @@
   "name": "marcapony",
   "displayName": "Marcapony",
   "icon": "./icon.png",
-  "version": "0.2.1",
-  "description": "Build your Marcapony website from Claude: custom code sections with animation and 3D, navbars and footers, and apps that Marcapony hosts. Page sections are saved as drafts for you to publish.",
+  "version": "0.3.0",
+  "description": "Build your Marcapony website with your AI assistant: custom code sections with animation and 3D, navbars and footers, and apps that Marcapony hosts. Page sections are saved as drafts for you to publish.",
   "author": {
     "name": "Creafolks",
     "email": "hello@marcapony.com",
     "url": "https://marcapony.com"
   },
-  "homepage": "https://github.com/creafolks/marcapony-claude-plugin",
-  "repository": "https://github.com/creafolks/marcapony-claude-plugin",
-  "documentationUrl": "https://github.com/creafolks/marcapony-claude-plugin#readme",
+  "homepage": "https://github.com/creafolks/marcapony-agent-plugin",
+  "repository": "https://github.com/creafolks/marcapony-agent-plugin",
+  "documentationUrl": "https://github.com/creafolks/marcapony-agent-plugin#readme",
   "supportUrl": "https://marcapony.com/iletisim",
   "privacyPolicyUrl": "https://app.marcapony.com/privacy-policy",
   "termsOfServiceUrl": "https://app.marcapony.com/terms-of-service",
   "license": "MIT",
-  "keywords": ["marcapony", "website-builder", "custom-code", "react", "tailwind", "gsap", "threejs", "apps", "cms"]
+  "keywords": ["marcapony", "website-builder", "custom-code", "react", "tailwind", "gsap", "threejs", "apps", "cms", "mcp", "agent-skills"]
 }
