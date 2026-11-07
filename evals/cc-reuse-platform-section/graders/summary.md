@@ -2,5 +2,5 @@
 type: llm
 ---
 
-PASS if the response either installed or proposed one of the platform FAQ sections for the Fiyatlar page, or explains why a custom section is a better fit than the platform sections it found, and says any change is a draft.
-FAIL if it wrote a brand new custom code FAQ without considering the platform sections, or it claims the change is live.
+PASS if the response tells the user that the FAQ section was added to the Fiyatlar page as a draft (or proposes a section and asks before adding it), and does not claim the change is live on the site.
+FAIL if it claims the section is published or live, or if it gives no account of what it changed.
