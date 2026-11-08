@@ -31,12 +31,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check the API key
+      # Either secret works: an API key, or a Claude subscription token made
+      # with `claude setup-token`.
+      - name: Check the credentials
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::error::The ANTHROPIC_API_KEY repository secret is not set, so the evals cannot run."
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::error::Neither the ANTHROPIC_API_KEY nor the CLAUDE_CODE_OAUTH_TOKEN repository secret is set, so the evals cannot run."
             exit 1
           fi
 
@@ -54,7 +57,12 @@ jobs:
       - name: Run evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
+          # A missing secret arrives as an empty variable; drop it so Claude Code
+          # does not try to authenticate with an empty value.
+          [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
+          [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || unset CLAUDE_CODE_OAUTH_TOKEN
           claude plugin eval . \
             --trust-plugin \
             --no-publish \
