@@ -1,0 +1,102 @@
+name: Plugin evals
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "evals/**"
+      - ".claude-plugin/**"
+      - ".mcp.json"
+      - ".github/workflows/evals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CLAUDE_CODE_VERSION: "2.1.318"
+  EVAL_MODEL: claude-sonnet-5-5
+  JUDGE_MODEL: claude-haiku-5-5
+
+jobs:
+  evals:
+    # Pull requests from forks get no secrets, so there is nothing to run them with.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # Either secret works: an API key, or a Claude subscription token made
+      # with `claude setup-token`.
+      - name: Check the credentials
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::error::Neither the ANTHROPIC_API_KEY nor the CLAUDE_CODE_OAUTH_TOKEN repository secret is set, so the evals cannot run."
+            exit 1
+          fi
+
+      - name: Install Claude Code
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash -s "$CLAUDE_CODE_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Validate the plugin
+        run: claude plugin validate --strict .
+
+      # The suite answers every Marcapony tool from evals/mocks, so no real
+      # account is reached. Write and Edit are granted for the app cases, which
+      # change a fixture project in the run's own workspace.
+      - name: Run evals
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          # A missing secret arrives as an empty variable; drop it so Claude Code
+          # does not try to authenticate with an empty value.
+          [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
+          [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || unset CLAUDE_CODE_OAUTH_TOKEN
+          claude plugin eval . \
+            --trust-plugin \
+            --no-publish \
+            --scaffold \
+            --allow-tools Write Edit \
+            --ablation none \
+            --runs 2 \
+            --concurrency 4 \
+            --model "$EVAL_MODEL" \
+            --judge-model "$JUDGE_MODEL" \
+            --threshold 0.8 \
+            --max-cost-usd 10 \
+            --report eval-report.html \
+            --json eval-results.json
+
+      - name: Summarise
+        if: always() && hashFiles('eval-results.json') != ''
+        run: |
+          {
+            echo "### Plugin evals"
+            echo
+            echo "| Case | Score | Failed graders |"
+            echo "|---|---|---|"
+            jq -r '.cases[] | [.name, ([.arms.with[].score] | add / length * 100 | floor | tostring) + "%", ([.arms.with[].graders[]? | select(.passed | not) | .name] | unique | join(", "))] | "| " + join(" | ") + " |"' eval-results.json
+            echo
+            jq -r '"Cost: $" + (.costUsd * 100 | round / 100 | tostring) + ", " + (.durationSeconds | tostring) + " s"' eval-results.json
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the report
+        if: always() && hashFiles('eval-results.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: |
+            eval-report.html
+            eval-results.json
+          retention-days: 14
